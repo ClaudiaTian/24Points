@@ -10,11 +10,14 @@ class App extends React.Component {
      started: false,
      numbers: [],
      cards: [],
-     solution: '',
+     solution: [],
+     cardsAdded: []
     }
 
    this.onGameEnd = this.onGameEnd.bind(this)
    this.generateCards = this.generateCards.bind(this)
+   this.addToSolution = this.addToSolution.bind(this)
+   this.checkResult = this.checkResult.bind(this)
   }
 
   componentDidMount(){
@@ -28,6 +31,7 @@ class App extends React.Component {
 
   }
 
+  //avoid generating two same cards
   generateCards() {
     let cards = []
     let numbers = []
@@ -44,6 +48,29 @@ class App extends React.Component {
     console.log(cards)
   }
 
+  addToSolution(number) {
+    if(!this.state.cardsAdded.includes(this.state.cards[number])){
+      let solution = this.state.solution
+      let cardsAdded = this.state.cardsAdded
+      solution.push(String(this.state.numbers[number]))
+      cardsAdded.push(this.state.cards[number])
+
+      console.log(solution)
+      this.setState({solution})
+    }
+    
+  }
+
+  checkResult() {
+    try {
+      alert(eval("("+this.state.solution.join('')+")"))
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        alert("Invalid Equation!");
+      }
+    }
+  }
+
   render() {
 
     if(this.state.time === 0){
@@ -56,23 +83,28 @@ class App extends React.Component {
         {this.state.started ?
           <div>
             <p>Time left: {this.state.time}</p>
-            <img onClick={()=>this.setState({solution:this.state.numbers[0]})} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[0]+'.png'} />
-            <img onClick={()=>this.setState({solution:this.state.numbers[1]})} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[1]+'.png'} />
-            <img onClick={()=>this.setState({solution:this.state.numbers[2]})} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[2]+'.png'} />
-            <img onClick={()=>this.setState({solution:this.state.numbers[3]})} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[3]+'.png'} />
+            <img onClick={() => this.addToSolution(0)} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[0]+'.png'} />
+            <img onClick={() => this.addToSolution(1)} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[1]+'.png'} />
+            <img onClick={() => this.addToSolution(2)} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[2]+'.png'} />
+            <img onClick={() => this.addToSolution(3)} style={{cursor: 'pointer', width:138, height:212}} src={'./img/'+this.state.cards[3]+'.png'} />
           
             <div>
-              <span style={{cursor: 'pointer', margin: 10, fontSize: 54}}>+</span>
-              <span style={{cursor: 'pointer', margin: 10, fontSize: 54}}>-</span>
-              <span style={{cursor: 'pointer', margin: 10, fontSize: 54}}>×</span>
-              <span style={{cursor: 'pointer', margin: 10, fontSize: 54}}>÷</span>
-              <span style={{cursor: 'pointer', margin: 10, fontSize: 54}}>(</span>
-              <span style={{cursor: 'pointer', margin: 10, fontSize: 54}}>)</span>
+              <span onClick={() => { let solution = this.state.solution; solution.push('+'); this.setState({solution});}} style={{cursor: 'pointer', margin: 10, fontSize: 54}}>+</span>
+              <span onClick={() => { let solution = this.state.solution; solution.push('-'); this.setState({solution});}} style={{cursor: 'pointer', margin: 10, fontSize: 54}}>-</span>
+              <span onClick={() => { let solution = this.state.solution; solution.push('*'); this.setState({solution});}} style={{cursor: 'pointer', margin: 10, fontSize: 54}}>×</span>
+              <span onClick={() => { let solution = this.state.solution; solution.push('/'); this.setState({solution});}} style={{cursor: 'pointer', margin: 10, fontSize: 54}}>÷</span>
+              <span onClick={() => { let solution = this.state.solution; solution.push('('); this.setState({solution});}} style={{cursor: 'pointer', margin: 10, fontSize: 54}}>(</span>
+              <span onClick={() => { let solution = this.state.solution; solution.push(')'); this.setState({solution});}} style={{cursor: 'pointer', margin: 10, fontSize: 54}}>)</span>
+              <span onClick={() => { let cardsAdded = this.state.cardsAdded; if (this.state.solution[this.state.solution.length-1].match(/\d/)) cardsAdded.pop(); this.setState({cardsAdded}); let solution = this.state.solution; solution.pop(); this.setState({solution});}} style={{cursor: 'pointer', margin: 10, fontSize: 54}}>Del</span>
             </div>
 
             <div>
               <p>Solution:</p>
-              <p>{this.state.solution}</p>
+              <p>{this.state.solution.join(' ')}</p>
+            </div>
+
+            <div>
+              <button onClick={this.checkResult}>Check</button>
             </div>
           </div>
           :
